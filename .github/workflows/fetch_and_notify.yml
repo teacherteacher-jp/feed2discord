@@ -17,5 +17,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.2
       - name: Run script
         run: ruby app.rb ${{ env.time }}
