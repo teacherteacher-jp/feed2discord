@@ -9,10 +9,13 @@ end
 feed_url = ENV["FEED_URL"]
 webhook_url = ENV["WEBHOOK_URL"]
 
+last_successed_at = ARGV.shift
+last_successed_at = last_successed_at.nil? ? Time.now : Time.parse(last_successed_at)
+
 feed = Feedjira.parse(Faraday.get(feed_url).body)
 
 feed.entries.each do |entry|
-  break if entry.published < (Time.now - 15 * 60)
+  break if entry.published < last_successed_at
 
   message = <<~MESSAGE
     :bell: 新着エピソード :bell:
