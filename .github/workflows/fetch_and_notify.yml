@@ -1,3 +1,5 @@
+name: Fetch and notify
+
 on:
   schedule:
     - cron: "*/15 * * * *"
