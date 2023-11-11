@@ -10,6 +10,6 @@ jobs:
       - id: prev-run-time
         name: Get the prev run time
         run: |
-	  url="https://api.github.com/repos/teacherteacher-jp/feed2discord/actions/workflows/fetch_and_notify.yml/runs?status=success&per_page=1"
+          url="https://api.github.com/repos/teacherteacher-jp/feed2discord/actions/workflows/fetch_and_notify.yml/runs?status=success&per_page=1"
           echo "::set-output name=time::$(curl -fsSL "$url" | jq -r '.workflow_runs[0].created_at')"
       - run: echo ${{ steps.last-execution.outputs.time }}
