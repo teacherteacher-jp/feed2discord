@@ -21,3 +21,6 @@ jobs:
           ruby-version: 3.2.2
       - name: Run script
         run: ruby app.rb ${{ env.time }}
+        env:
+          FEED_URL: ${{ secrets.FEED_URL }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
