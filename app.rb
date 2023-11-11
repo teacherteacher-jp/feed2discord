@@ -13,8 +13,13 @@ last_successed_at = ARGV.shift
 last_successed_at = last_successed_at.nil? ? Time.now : Time.parse(last_successed_at)
 
 feed = Feedjira.parse(Faraday.get(feed_url).body)
+entries = feed.entries.sort_by(&:published).reverse
 
-feed.entries.each do |entry|
+exit if entries.empty?
+
+p [entries.size, last_successed_at, entries.first.published]
+
+entries.each do |entry|
   break if entry.published < last_successed_at
 
   message = <<~MESSAGE
