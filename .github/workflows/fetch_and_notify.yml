@@ -8,11 +8,9 @@ on:
 jobs:
   fetch_and_notify:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Get the prev run time
-        run: |
-          url="https://api.github.com/repos/teacherteacher-jp/feed2discord/actions/workflows/fetch_and_notify.yml/runs?status=success&per_page=1"
-          echo "time=$(curl -fsSL "$url" | jq -r '.workflow_runs[0].created_at')" >> "$GITHUB_ENV"
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set up Ruby
@@ -20,7 +18,13 @@ jobs:
         with:
           ruby-version: 3.2.2
       - name: Run script
-        run: ruby app.rb ${{ env.time }}
+        run: ruby app.rb
         env:
           FEED_URL: ${{ secrets.FEED_URL }}
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+      - name: Save progress
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Save progress"
+          commit_options: "--no-verify --signoff"
+  
