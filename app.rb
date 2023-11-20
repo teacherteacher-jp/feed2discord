@@ -9,25 +9,30 @@ end
 feed_url = ENV["FEED_URL"]
 webhook_url = ENV["WEBHOOK_URL"]
 
-last_successed_at = ARGV.shift
-last_successed_at = last_successed_at.nil? ? Time.now : Time.parse(last_successed_at)
-
+already_notified = File.read("already_notified.txt").split("\n")
 feed = Feedjira.parse(Faraday.get(feed_url).body)
-entries = feed.entries.sort_by(&:published).reverse
+entries = feed.entries.sort_by(&:published)
 
 exit if entries.empty?
 
-p [entries.size, last_successed_at, entries.first.published]
+p [entries.size, already_notified.size, entries.last.published]
 
 entries.each do |entry|
-  break if entry.published < last_successed_at
+  url = entry.url
+
+  next if already_notified.include?(url)
 
   message = <<~MESSAGE
     :bell: 新着エピソード :bell:
     お聞きになったら、ぜひ感想をお寄せください
-    #{entry.url}
+    #{url}
   MESSAGE
 
   puts message
+  puts
   Faraday.post(webhook_url, { content: message })
+
+  already_notified.push(url)
 end
+
+File.write("already_notified.txt", already_notified.join("\n"))
