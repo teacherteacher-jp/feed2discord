@@ -35,4 +35,4 @@ entries.each do |entry|
   already_notified.push(url)
 end
 
-File.write("already_notified.txt", already_notified.join("\n"))
+File.write("already_notified.txt", already_notified.join("\n") + "\n")
