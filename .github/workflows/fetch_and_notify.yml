@@ -20,11 +20,9 @@ jobs:
       - name: Run script
         run: ruby app.rb
         env:
-          FEED_URL: ${{ secrets.FEED_URL }}
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          CONFIG: ${{ secrets.CONFIG }}
       - name: Save progress
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Save progress"
           commit_options: "--no-verify --signoff"
-  
