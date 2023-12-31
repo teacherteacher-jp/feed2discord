@@ -6,33 +6,37 @@ gemfile do
   gem "feedjira"
 end
 
-feed_url = ENV["FEED_URL"]
-webhook_url = ENV["WEBHOOK_URL"]
-
 already_notified = File.read("already_notified.txt").split("\n")
-feed = Feedjira.parse(Faraday.get(feed_url).body)
-entries = feed.entries.sort_by(&:published)
 
-exit if entries.empty?
+config = ENV["CONFIG"]
+config ||= File.read("config.tsv")
 
-p [entries.size, already_notified.size, entries.last.published]
+config.split("\n").map { _1.split("|||") }.each do |title, feed_url, webhook_url|
+  puts title
 
-entries.each do |entry|
-  url = entry.url
+  feed = Feedjira.parse(Faraday.get(feed_url).body)
+  entries = feed.entries.sort_by(&:published)
 
-  next if already_notified.include?(url)
+  next if entries.empty?
 
-  message = <<~MESSAGE
-    :bell: 新着エピソード :bell:
-    お聞きになったら、ぜひ感想をお寄せください
-    #{url}
-  MESSAGE
+  p [entries.size, already_notified.size, entries.last.published]
 
-  puts message
-  puts
-  Faraday.post(webhook_url, { content: message })
+  entries.each do |entry|
+    url = entry.url
 
-  already_notified.push(url)
+    next if already_notified.include?(url)
+
+    message = <<~MESSAGE
+      新着エピソードをキャッチしました！
+      #{url}
+    MESSAGE
+
+    puts message
+    puts
+    Faraday.post(webhook_url, { content: message })
+
+    already_notified.push(url)
+  end
 end
 
 File.write("already_notified.txt", already_notified.sort.join("\n") + "\n")
