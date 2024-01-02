@@ -12,7 +12,7 @@ config = ENV["CONFIG"]
 config ||= File.read("config.tsv")
 
 config.split("\n").map { _1.split("|||") }.each do |title, feed_url, webhook_url|
-  puts title
+  puts "%s\n%s" % ["=" * 40, title]
 
   feed = Feedjira.parse(Faraday.get(feed_url).body)
   entries = feed.entries.sort_by(&:published)
