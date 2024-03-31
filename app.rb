@@ -33,7 +33,7 @@ config.split("\n").map { _1.split("|||") }.map { _1.map(&:strip) }.each do |titl
       author: { name: feed.title, url: feed.url },
       title: entry.title,
       url: entry.url,
-      thumbnail: { url: entry.image || feed.image&.url },
+      thumbnail: { url: entry.itunes_image || feed.image&.url },
       timestamp: entry.published.iso8601,
     }]
     Faraday.post(webhook_url, { content:, embeds: }.to_json, "Content-Type" => "application/json")
