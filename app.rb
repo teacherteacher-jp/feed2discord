@@ -11,7 +11,7 @@ already_notified = File.read("already_notified.txt").split("\n")
 config = ENV["CONFIG"]
 config ||= File.read("config.tsv")
 
-config.split("\n").map { _1.split("|||") }.each do |title, feed_url, webhook_url|
+config.split("\n").map { _1.split("|||") }.map { _1.map(&:strip) }.each do |title, feed_url, webhook_url|
   puts "%s\n%s" % ["=" * 40, title]
 
   feed = Feedjira.parse(Faraday.get(feed_url).body)
@@ -23,8 +23,9 @@ config.split("\n").map { _1.split("|||") }.each do |title, feed_url, webhook_url
 
   entries.each do |entry|
     url = entry.url
+    key = [feed_url, entry.entry_id].join("|||")
 
-    next if already_notified.include?(url)
+    next if already_notified.include?(key)
 
     message = <<~MESSAGE
       新着エピソードをキャッチしました！
@@ -35,7 +36,7 @@ config.split("\n").map { _1.split("|||") }.each do |title, feed_url, webhook_url
     puts
     Faraday.post(webhook_url, { content: message })
 
-    already_notified.push(url)
+    already_notified.push(key)
   end
 end
 
