@@ -22,22 +22,25 @@ config.split("\n").map { _1.split("|||") }.map { _1.map(&:strip) }.each do |titl
   p [entries.size, already_notified.size, entries.last.published]
 
   entries.each do |entry|
-    url = entry.url
     key = [feed_url, entry.entry_id].join("|||")
 
     next if already_notified.include?(key)
 
-    message = <<~MESSAGE
-      新着エピソードをキャッチしました！
-      #{url}
-    MESSAGE
+    puts "新着！ #{entry.title} #{entry.url}"
 
-    puts message
-    puts
-    Faraday.post(webhook_url, { content: message })
+    content = "新着エピソードをキャッチしました！"
+    embeds = [{
+      author: { name: feed.title, url: feed.url },
+      title: entry.title,
+      url: entry.url,
+      thumbnail: { url: entry.image || feed.image&.url },
+      timestamp: entry.published.iso8601,
+    }]
+    Faraday.post(webhook_url, { content:, embeds: }.to_json, "Content-Type" => "application/json")
+
+    sleep 2
 
     already_notified.push(key)
+    File.write("already_notified.txt", already_notified.sort.join("\n") + "\n")
   end
 end
-
-File.write("already_notified.txt", already_notified.sort.join("\n") + "\n")
