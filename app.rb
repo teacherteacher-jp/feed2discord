@@ -14,6 +14,13 @@ config ||= File.read("config.tsv")
 config.split("\n").map { _1.split("|||") }.map { _1.map(&:strip) }.each do |title, feed_url, webhook_urls|
   puts "%s\n%s" % ["=" * 40, title]
 
+  # Spotify/AnchorのRSSはVarnish 3層CDNでキャッシュされる(s-maxage=7日)。
+  # クエリパラメータやCache-Controlヘッダはedge側で正規化・無視されるため効かない。
+  # 1回目で古いキャッシュを持つPOPがoriginにリフレッシュをかけ、
+  # 2回目で新しいキャッシュが返ってくる挙動があるので、ウォームアップ後に本命を取得する。
+  Faraday.get(feed_url)
+  sleep 2
+
   feed = Feedjira.parse(Faraday.get(feed_url).body)
   entries = feed.entries.sort_by(&:published)
 
