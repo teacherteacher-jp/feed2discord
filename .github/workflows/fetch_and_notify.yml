@@ -12,11 +12,11 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3.4
+          ruby-version: "4.0"
       - name: Run script
         run: ruby app.rb
         env:
