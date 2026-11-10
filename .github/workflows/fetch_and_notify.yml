@@ -22,7 +22,7 @@ jobs:
         env:
           CONFIG: ${{ secrets.CONFIG }}
       - name: Save progress
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "Save progress"
           commit_author: "juneboku <125535885+juneboku@users.noreply.github.com>"
